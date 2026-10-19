@@ -6,10 +6,13 @@
 
 <p align="center">    
 面向日常沟通、情绪陪伴、规则与边界、学习与成长、青春期变化和家庭变化的亲子沟通军师， 
-  
-  结合情绪支持、发展心理学、亲子沟通研究和对话分析，把复杂的亲子互动变成可执行的下一步。
-
 </p>
+
+<p align="center">    
+结合情绪支持、发展心理学、亲子沟通研究和对话分析，把复杂的亲子互动变成可执行的下一步。
+</p>
+
+
 
 <p align="center">    
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-orange.svg" alt="License"></a>    

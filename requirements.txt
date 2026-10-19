@@ -1,0 +1,47 @@
+# 亲子沟通军师 · 可选依赖
+
+本 Skill 的**核心不需要任何第三方依赖**：`SKILL.md` 与 `references/` 全是纯文本，
+装上即可完整使用「看清对话、给下次能照说的话、话题追踪、长期档案」这些功能。
+
+下面这些**只在「处理录音」这一条路径上才需要**，因此全部标为可选。
+
+## 本机离线转写（默认路径）
+
+```bash
+pip install faster-whisper
+```
+
+- `faster-whisper` 会自动带入 `ctranslate2` / `tokenizers` / `onnxruntime` 等。
+- **不是 wav 的音频**（m4a / mp3 / 微信语音等）还需要 PyAV 与 numpy 来解码：
+  `pip install av numpy`。
+- 首次运行会下载模型（small 约 500MB，国内默认走 `hf-mirror.com` 镜像）；
+  自动下载失败时，用 `--model-dir <目录>` 指向手工下载的模型。
+
+## 腾讯云转写（可选，需自备密钥）
+
+**不需要任何第三方库。** `scripts/transcribe.py` 用标准库自己实现
+TC3-HMAC-SHA256 签名（`urllib` + `hmac` + `hashlib`）。
+
+启用方式：设置环境变量 `TENCENTCLOUD_SECRET_ID` 与 `TENCENTCLOUD_SECRET_KEY`
+（可选 `TENCENTCLOUD_REGION`，默认 `ap-guangzhou`）后，脚本会自动走云端；
+或用 `--provider tencent` 强制、`--provider local` 强制离线。
+
+> 密钥由使用者自己申请和填写。本 Skill 不代注册账号、不代申请密钥、不写入任何配置。
+> 云端路径会把录音上传处理并按量计费；只在意隐私时用 `--provider local`。
+
+## 为什么写成注释而不是硬依赖
+
+不装这些也能用全部非录音功能。写死成硬依赖，会让只想做文字分析的使用者被迫下载
+数百 MB 的模型与运行时。
+
+---
+
+# 取消下面任意一段的注释即可用 requirements.txt 方式安装：
+
+## 最小可用（只要能跑本机转写）
+# faster-whisper>=1.0.0
+
+## 完整（含非 wav 音频解码）
+# faster-whisper>=1.0.0
+# av>=10.0.0
+# numpy>=1.24

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="亲子沟通军师">
+  <rect width="512" height="512" rx="112" fill="#FBF3E7"/>
+  <rect x="24" y="24" width="464" height="464" rx="92" fill="none" stroke="#E8A85C" stroke-width="4" stroke-dasharray="10 8" opacity="0.8"/>
+  <!-- 两个对话气泡：一大一小，表示家长与孩子 -->
+  <path d="M96 168 h200 a40 40 0 0 1 40 40 v72 a40 40 0 0 1 -40 40 h-96 l-52 44 v-44 h-52 a40 40 0 0 1 -40 -40 v-72 a40 40 0 0 1 40 -40 z"
+        fill="#E8883A"/>
+  <path d="M236 264 h180 a36 36 0 0 1 36 36 v56 a36 36 0 0 1 -36 36 h-64 l-44 38 v-38 h-72 a36 36 0 0 1 -36 -36 v-56 a36 36 0 0 1 36 -36 z"
+        fill="#F3C58A"/>
+  <!-- 小装饰线，手账感 -->
+  <circle cx="150" cy="244" r="10" fill="#FBF3E7"/>
+  <circle cx="196" cy="244" r="10" fill="#FBF3E7"/>
+  <circle cx="242" cy="244" r="10" fill="#FBF3E7"/>
+  <circle cx="308" cy="336" r="9" fill="#8A5A2B" opacity="0.55"/>
+  <circle cx="348" cy="336" r="9" fill="#8A5A2B" opacity="0.55"/>
+</svg>

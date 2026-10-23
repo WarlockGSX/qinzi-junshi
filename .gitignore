@@ -1,0 +1,38 @@
+# 转写输出
+output/
+*.transcript.txt
+*.srt
+*.vtt
+
+# 音频与截图（本地材料，绝不入库）
+*.m4a
+*.mp3
+*.wav
+*.amr
+*.aac
+*.flac
+*.ogg
+*.mp4
+
+# 密钥与本地配置
+.env
+.env.*
+*.key
+config.local.*
+
+# 档案数据库
+*.sqlite3
+*.sqlite3-journal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 编辑器与系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

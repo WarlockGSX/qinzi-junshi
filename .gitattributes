@@ -1,0 +1,7 @@
+# 本仓库有意混用换行符：119 份 references 是 CRLF，CHANGELOG / README /
+# SKILL / 00-frame/亲子沟通判断维度 是 LF。校验脚本按字节比对，任何自动转换
+# 都会把这件事悄悄改掉，所以一律关掉。
+* -text
+
+*.png binary
+*.sqlite3 binary

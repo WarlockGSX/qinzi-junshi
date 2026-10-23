@@ -13,7 +13,7 @@
 用法示例：
     python archive.py status
     python archive.py enable --confirm
-    python archive.py apply --json '{"child_age":"9","child_stage":"小学低年级"}'
+    python archive.py apply --json '{"field":"child_age","value":"9"}'
     python archive.py dialogue-add --json '{"summary":"聊了写作业的事","state":"卡住","parent_feeling":"有点急","child_observation":"说了两句就不说了","change_point":"这次没摔门"}'
     python archive.py dialogue-show
     python archive.py context --max-chars 4000
@@ -47,6 +47,9 @@ PROFILE_FIELDS = {
     "scene_tags", "session_level",
 }
 # ---- 对话记录字段白名单 ----
+# 单主体设计：家长只记自己的孩子，不传就用这一个。
+DEFAULT_SUBJECT = "child"
+
 DIALOGUE_FIELDS = {
     "dialogued_at", "summary", "state", "parent_feeling",
     "child_observation", "change_point",
@@ -188,7 +191,7 @@ def validate_profile(raw: dict) -> dict[str, Any]:
             "FIELD_NOT_ALLOWED",
             f"档案不接受字段 {field}；只接受：{'、'.join(sorted(PROFILE_FIELDS))}")
     return {
-        "subject_id": clean_text("subject_id", raw.get("subject_id"), 64),
+        "subject_id": clean_text("subject_id", raw.get("subject_id") or DEFAULT_SUBJECT, 64),
         "field": field,
         "value": clean_text("value", raw.get("value"), MAX_VALUE_CHARS),
         "source_type": clean_text("source_type", raw.get("source_type", "user_explicit"), 32),
@@ -205,7 +208,7 @@ def validate_dialogue(raw: dict) -> dict[str, Any]:
     if not state and not clean_text("summary", raw.get("summary", ""), 200, required=False):
         raise MemoryErrorWithCode("INVALID_DELTA", "至少要写一句“这次聊了什么”或一个沟通状态")
     return {
-        "subject_id": clean_text("subject_id", raw.get("subject_id"), 64),
+        "subject_id": clean_text("subject_id", raw.get("subject_id") or DEFAULT_SUBJECT, 64),
         "dialogued_at": clean_text("dialogued_at", raw.get("dialogued_at") or now_iso()[:10], 32),
         "summary": clean_text("summary", raw.get("summary", ""), 200, required=False),
         "state": state,
@@ -349,6 +352,25 @@ def cmd_dialogue_show(args):
     emit({"count": len(rows), "dialogues": [row_dict(r) for r in rows]})
 
 
+def cmd_dialogue_delete(args):
+    """删掉一条对话记录。--id 删指定那条；不给则删最近一条。不给 --confirm 不删。"""
+    if not args.confirm:
+        raise MemoryErrorWithCode("CONFIRMATION_REQUIRED", "需要 --confirm 才会删除")
+    with connect() as conn:
+        conn.execute("BEGIN IMMEDIATE")
+        if args.id:
+            row = conn.execute("SELECT * FROM dialogues WHERE id = ?", (args.id,)).fetchone()
+        else:
+            row = conn.execute(
+                "SELECT * FROM dialogues ORDER BY created_at DESC, seq DESC LIMIT 1").fetchone()
+        if not row:
+            raise MemoryErrorWithCode("NOT_FOUND", "没有找到要删除的记录")
+        conn.execute("DELETE FROM dialogues WHERE id = ?", (row["id"],))
+        op_id = log_op(conn, "dialogue-delete", [row_dict(row)], [])
+        conn.commit()
+    emit({"ok": True, "op_id": op_id, "deleted": row_dict(row)})
+
+
 def cmd_undo(args):
     with connect() as conn:
         op = (conn.execute("SELECT * FROM operations WHERE op_id = ?", (args.op_id,)).fetchone()
@@ -472,6 +494,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     apply_cmd = with_source(sub.add_parser("apply")); apply_cmd.set_defaults(func=cmd_apply)
     da = with_source(sub.add_parser("dialogue-add")); da.set_defaults(func=cmd_dialogue_add)
+    dd = sub.add_parser("dialogue-delete")
+    dd.add_argument("--id", help="要删的记录 id；不给则删最近一条")
+    dd.add_argument("--last", action="store_true", help="删最近一条（默认行为，写明更清楚）")
+    dd.add_argument("--confirm", action="store_true")
+    dd.set_defaults(func=cmd_dialogue_delete)
 
     ds = sub.add_parser("dialogue-show")
     ds.add_argument("--subject-id")
